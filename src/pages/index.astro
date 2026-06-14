@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <section class="about">
+    <div class="inner">
+      <p class="eyebrow">Student · Builder · 2026</p>
+      <h1 class="name">Chandresh<br />Kanyal</h1>
+      <div class="bio">
+        <p>
+          I build tools I wish existed. Right now that's
+          <a href="/projects/wealth-planner/">Copena</a> —
+          a free wealth-planning platform built on the belief that
+          financial education shouldn't cost anything.
+        </p>
+        <p>
+          I'm a student at SRM Institute of Science and Technology.
+          I care about clean software, clear writing, and the quiet
+          satisfaction of a thing that works exactly as it should.
+        </p>
+      </div>
+      <div class="links">
+        <a href="/projects/wealth-planner/">See Copena <span>→</span></a>
+        <a href="/blog">Writing <span>→</span></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about {
+    padding: 96px 32px 64px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .inner {
+    max-width: 540px;
+  }
+
+  .eyebrow {
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .name {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(52px, 8vw, 80px);
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 36px;
+  }
+
+  .bio {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--text2);
+    margin-bottom: 48px;
+  }
+
+  .bio a {
+    color: var(--text);
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.15s;
+  }
+
+  .bio a:hover {
+    border-bottom-color: var(--text);
+  }
+
+  .links {
+    display: flex;
+    gap: 32px;
+  }
+
+  .links a {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .links a span {
+    display: inline-block;
+    transition: transform 0.15s;
+  }
+
+  .links a:hover span {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 640px) {
+    .about { padding: 64px 20px 48px; }
+    .name  { font-size: 52px; }
+  }
+</style>
