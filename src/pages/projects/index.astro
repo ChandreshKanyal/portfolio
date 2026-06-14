@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const projects = [
+  {
+    name: 'Copena',
+    tagline: 'Wealth planning, honestly.',
+    description: 'Free, honest wealth-planning tools — SIP calculator, SWP planner, and more. No sign-up, no ads, no upsell.',
+    href: '/projects/wealth-planner/index.html',
+    tags: ['SIP', 'SWP', 'LTCG tax', 'Retirement'],
+    status: 'live',
+  },
+];
+---
+
+<BaseLayout title="Projects — Chandresh Kanyal">
+  <section class="projects">
+    <div class="inner">
+      <header class="page-header">
+        <p class="eyebrow">Projects</p>
+        <h1 class="heading">Things I've built</h1>
+        <p class="subhead">Tools that should exist, made free for everyone.</p>
+      </header>
+
+      <ul class="grid">
+        {projects.map(p => (
+          <li>
+            <a href={p.href} class="card">
+              <div class="card-top">
+                <span class="card-name">{p.name}</span>
+                {p.status === 'live' && <span class="badge">Live</span>}
+              </div>
+              <p class="card-tagline">{p.tagline}</p>
+              <p class="card-desc">{p.description}</p>
+              <ul class="tags">
+                {p.tags.map(t => <li class="tag">{t}</li>)}
+              </ul>
+              <span class="arrow">→</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .projects {
+    padding: 80px 32px 96px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .inner { max-width: 720px; }
+
+  .page-header { margin-bottom: 56px; }
+
+  .eyebrow {
+    font-size: 11.5px;
+    font-weight: 400;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .heading {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(36px, 5vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+
+  .subhead {
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .grid {
+    list-style: none;
+    display: grid;
+    gap: 16px;
+  }
+
+  .card {
+    display: block;
+    padding: 32px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    text-decoration: none;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .card:hover {
+    border-color: var(--text2);
+    background: color-mix(in srgb, var(--text) 3%, transparent);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .card-name {
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 2px 8px;
+  }
+
+  .card-tagline {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .card-desc {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    max-width: 520px;
+  }
+
+  .tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 3px 10px;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 32px;
+    right: 32px;
+    font-size: 16px;
+    color: var(--muted);
+    transition: transform 0.15s, color 0.15s;
+  }
+
+  .card:hover .arrow {
+    transform: translate(2px, -2px);
+    color: var(--text);
+  }
+
+  @media (max-width: 640px) {
+    .projects { padding: 56px 20px 64px; }
+  }
+</style>
