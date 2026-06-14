@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Copena — Wealth Planning Tools</title>
+<meta name="description" content="Free, honest wealth planning tools. SIP calculator, SWP planner, retirement planning and more. No sign-up, no ads, no nonsense."/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231D6A5C'/%3E%3Ctext x='6' y='23' font-family='Georgia,serif' font-size='20' font-weight='bold' fill='white'%3Ec%3C/text%3E%3Ccircle cx='22' cy='9' r='3' fill='white'/%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Fragment+Mono&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="copena-design.css"/>
+<script>const t=localStorage.getItem('copena-theme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+<style>
+/* ── Landing-specific styles ──────────────────────────────────── */
+
+/* Hero */
+.hero-scroll-wrapper {
+  position: relative;
+  height: 185vh;
+}
+.hero-image-container {
+  position: sticky;
+  top: 56px;
+  width: 100%;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+  will-change: border-radius, transform;
+  transform-origin: center center;
+}
+.hero-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  display: block;
+}
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(238,236,234,0.3) 0%, rgba(0,0,0,0) 22%),
+    linear-gradient(to top, rgba(238,236,234,1) 0%, rgba(238,236,234,0) 44%);
+  pointer-events: none;
+}
+.hero-text {
+  position: absolute;
+  top: 13%;
+  left: 0;
+  right: 0;
+  padding: 0 56px;
+}
+.hero-text h1 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(3.6rem, 8.5vw, 7.5rem);
+  font-weight: 300;
+  font-optical-sizing: auto;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  color: #1a1916;
+  margin-bottom: 40px;
+}
+.hero-text h1 em {
+  font-style: italic;
+  font-weight: 300;
+  color: #1D6A5C;
+}
+.hero-link {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(26,25,22,0.55);
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.hero-link:hover { color: #1a1916; }
+.hero-link-arrow {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s;
+}
+.hero-link:hover .hero-link-arrow { transform: translateX(3px); }
+@media (max-width: 768px) {
+  .hero-scroll-wrapper { height: 145vh; }
+  .hero-text { padding: 0 24px; top: 11%; }
+}
+
+/* Tools section */
+.tools-section {
+  padding: 72px 48px 80px;
+  border-bottom: 1px solid var(--line);
+}
+.section-head {
+  margin-bottom: 40px;
+}
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-weight: 300;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  line-height: 1.2;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.tool-card {
+  background: rgba(245, 244, 242, 0.55);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-decoration: none;
+  transition: background 0.25s, box-shadow 0.25s, transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+  position: relative;
+  border: none;
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-sm);
+}
+.tool-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from 210deg,
+    rgba(180,188,200,0.3) 0%,
+    rgba(140,150,165,0.08) 25%,
+    rgba(120,128,140,0.03) 50%,
+    rgba(140,150,165,0.08) 75%,
+    rgba(180,188,200,0.3) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 0.3s, background 0.3s;
+}
+.tool-card:hover::before {
+  background: conic-gradient(from 210deg,
+    rgba(220,228,242,1) 0%,
+    rgba(180,190,210,0.6) 18%,
+    rgba(130,140,158,0.15) 45%,
+    rgba(160,170,190,0.4) 72%,
+    rgba(220,228,242,1) 100%
+  );
+}
+.tool-card:hover {
+  background: rgba(245,244,242,0.72);
+  box-shadow: var(--shadow-md), 0 0 18px rgba(170,170,170,0.25);
+  transform: translateY(-5px);
+}
+.tool-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(160,160,160,0.18) 0%, transparent 62%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.tool-card:hover::after { opacity: 1; }
+.tool-card.soon { cursor: default; }
+.tool-card.soon:hover {
+  background: rgba(245,244,242,0.55);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.55);
+  transform: none;
+}
+.tool-card.soon::after { display: none; }
+.tool-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-ring);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.tool-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tool-card.soon .tool-icon {
+  background: var(--surface2);
+  border-color: var(--line2);
+}
+.tool-card.soon .tool-icon svg { stroke: var(--subtle); }
+.tool-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: -0.005em;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tool-card.soon .tool-name { color: var(--muted); }
+.tool-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--subtle);
+  background: var(--surface3);
+  border-radius: 100px;
+  padding: 2px 8px;
+}
+.tool-desc {
+  font-size: 14.5px;
+  color: var(--muted);
+  line-height: 1.65;
+  flex: 1;
+}
+.tool-card.soon .tool-desc { color: var(--subtle); }
+.tool-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tool-feat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-radius: 100px;
+  padding: 3px 10px;
+}
+.tool-card.soon .tool-feat {
+  color: var(--subtle);
+  background: var(--surface2);
+}
+.tool-arrow {
+  position: absolute;
+  top: 36px;
+  right: 32px;
+  color: var(--subtle);
+  transition: color 0.15s, transform 0.15s;
+}
+.tool-card:not(.soon):hover .tool-arrow { color: var(--accent); transform: translate(2px, -2px); }
+.tool-arrow svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; }
+
+@media (max-width: 768px) {
+  .tools-section { padding: 56px 24px 64px; }
+  .tools-grid { grid-template-columns: 1fr; }
+}
+
+/* Philosophy strip */
+.philosophy {
+  padding: 72px 48px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 80px;
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+}
+.philosophy-left .section-title { max-width: 240px; }
+.philosophy-items {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+.philosophy-item {}
+.philosophy-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.10em;
+  margin-bottom: 14px;
+}
+.philosophy-item h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: 0;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.philosophy-item p {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+@media (max-width: 1000px) {
+  .philosophy { grid-template-columns: 1fr; gap: 40px; padding: 56px 24px; }
+  .philosophy-items { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 640px) {
+  .philosophy-items { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Nav -->
+  <nav class="c-nav fade-up">
+    <a href="index.html" class="c-mark">
+      <span class="c-mark-glyph">c<span class="dot">°</span></span>
+      <span class="c-mark-word">copena</span>
+    </a>
+    <div class="c-nav-links">
+      <a href="SIP.html">SIP Calculator</a>
+      <a href="SWP.html">SWP Calculator</a>
+      <a href="#" style="color:var(--subtle)">Retirement <span class="soon-pill">soon</span></a>
+      <a href="#" style="color:var(--subtle)">Goal Planner <span class="soon-pill">soon</span></a>
+    </div>
+    <div class="c-nav-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-body">
+
+    <!-- Hero -->
+    <div class="hero-scroll-wrapper" id="hero-wrapper">
+      <div class="hero-image-container" id="hero-img">
+        <img class="hero-bg-img" src="hero.jpg" alt=""/>
+        <div class="hero-gradient"></div>
+        <div class="hero-text fade-up">
+          <h1>Wealth planning,<br><em>honestly.</em></h1>
+          <a href="SIP.html" class="hero-link">
+            Start with SIP Calculator
+            <svg class="hero-link-arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tools -->
+    <section class="tools-section fade-up fade-up-d2">
+      <div class="section-head">
+        <div class="section-label">Tools</div>
+        <div class="section-title">Everything you need<br>to plan your wealth.</div>
+      </div>
+      <div class="tools-grid">
+
+        <a href="SIP.html" class="tool-card">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-6"/></svg>
+          </div>
+          <div class="tool-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+          <div>
+            <div class="tool-name">SIP Calculator</div>
+            <div class="tool-desc">See exactly what your monthly investment compounds to — after inflation, expense ratio, and LTCG tax. Compare against FD, PPF, and holding cash.</div>
+          </div>
+          <div class="tool-features">
+            <span class="tool-feat">LTCG tax</span>
+            <span class="tool-feat">Step-up SIP</span>
+            <span class="tool-feat">Real value</span>
+            <span class="tool-feat">Instrument compare</span>
+          </div>
+        </a>
+
+        <a href="SWP.html" class="tool-card">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 10l4 4 4-4 4 3"/></svg>
+          </div>
+          <div class="tool-arrow"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M7 7h10v10"/></svg></div>
+          <div>
+            <div class="tool-name">SWP Calculator</div>
+            <div class="tool-desc">Plan your systematic withdrawals after retirement. Find the safe withdrawal rate, see when your corpus depletes, and stress-test against inflation.</div>
+          </div>
+          <div class="tool-features">
+            <span class="tool-feat">Safe SWP</span>
+            <span class="tool-feat">Depletion forecast</span>
+            <span class="tool-feat">Step-up withdrawal</span>
+          </div>
+        </a>
+
+        <div class="tool-card soon">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+          </div>
+          <div>
+            <div class="tool-name">Retirement Planner <span class="tool-tag">soon</span></div>
+            <div class="tool-desc">Combine your SIP corpus, existing assets, EPF, and expected SWP into a single retirement readiness number. Know exactly if you're on track.</div>
+          </div>
+          <div class="tool-features">
+            <span class="tool-feat">Combined assets</span>
+            <span class="tool-feat">EPF + NPS</span>
+            <span class="tool-feat">Readiness score</span>
+          </div>
+        </div>
+
+        <div class="tool-card soon">
+          <div class="tool-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div class="tool-name">Goal Planner <span class="tool-tag">soon</span></div>
+            <div class="tool-desc">FIRE calculator, home loan true cost, car loan reality check. Understand the full cost of debt and what financial independence actually requires.</div>
+          </div>
+          <div class="tool-features">
+            <span class="tool-feat">FIRE number</span>
+            <span class="tool-feat">Loan true cost</span>
+            <span class="tool-feat">EMI vs invest</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Philosophy -->
+    <section class="philosophy fade-up fade-up-d3">
+      <div class="philosophy-left">
+        <div class="section-label">Why Copena</div>
+        <div class="section-title">Built on honesty,<br><em style="font-style:italic;color:var(--accent)">not optimism.</em></div>
+      </div>
+      <div class="philosophy-items">
+        <div class="philosophy-item">
+          <div class="philosophy-num">01</div>
+          <h3>Numbers, not narratives</h3>
+          <p>Every output shows you what your money is worth after inflation, tax, and fees — not the headline number fund houses use in ads.</p>
+        </div>
+        <div class="philosophy-item">
+          <div class="philosophy-num">02</div>
+          <h3>Free, always</h3>
+          <p>Financial education shouldn't have a paywall. Copena is free to use, with no sign-up, no ads, and no upsell. Planned to stay that way.</p>
+        </div>
+        <div class="philosophy-item">
+          <div class="philosophy-num">03</div>
+          <h3>Nothing extra</h3>
+          <p>Every element on screen earns its place. If it doesn't help you make a decision, it isn't here.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="c-footer fade-up fade-up-d4">
+    <div class="c-footer-left">
+      <a href="index.html" class="c-mark">
+        <span class="c-mark-glyph">c<span class="dot">°</span></span>
+        <span class="c-mark-word">copena</span>
+      </a>
+      <div class="c-footer-disc">
+        For educational use only. Not SEBI registered. Not financial advice. Numbers are simulated — past returns do not guarantee future performance. Always consult a qualified financial advisor before making investment decisions.
+      </div>
+    </div>
+    <div class="c-footer-right">
+      Free &amp; open<br>No sign-up · No ads<br>
+      <span style="color:var(--accent)">education should be free</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  const toggle = document.getElementById('theme-toggle');
+  toggle.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('copena-theme', next);
+  });
+
+  // Cursor depth glow on tool cards
+  document.querySelectorAll('.tool-card:not(.soon)').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+  });
+
+  // Scroll-shrink hero (Apple style)
+  (function () {
+    const wrapper = document.getElementById('hero-wrapper');
+    const container = document.getElementById('hero-img');
+    if (!wrapper || !container) return;
+    const SHRINK_OVER = 680; // px of scroll to complete the effect
+    function update() {
+      const progress = Math.max(0, Math.min(window.scrollY / SHRINK_OVER, 1));
+      const ease = progress < 0.5
+        ? 2 * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+      container.style.borderRadius = (ease * 28) + 'px';
+      container.style.transform = 'scale(' + (1 - ease * 0.055) + ')';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+</script>
+</body>
+</html>

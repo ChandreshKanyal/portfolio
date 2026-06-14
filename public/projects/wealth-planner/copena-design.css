@@ -1,0 +1,287 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Copena — Design System
+   Shared across all Copena pages. Import first.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Tokens ──────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds */
+  --bg:      #EEECEA;
+  --surface: #F5F4F2;
+  --surface2: #E5E3E0;
+  --surface3: #D8D6D2;
+
+  /* Text */
+  --text:    #1A1916;
+  --text2:   #4A4843;
+  --muted:   #7A7875;
+  --subtle:  #B0ADA8;
+
+  /* Borders */
+  --line:    rgba(0, 0, 0, 0.08);
+  --line2:   rgba(0, 0, 0, 0.14);
+
+  /* Brand accent — deep sage */
+  --accent:     #1D6A5C;
+  --accent-lt:  #24856E;
+  --accent-dk:  #155047;
+  --accent-bg:  rgba(29, 106, 92, 0.08);
+  --accent-ring: rgba(29, 106, 92, 0.24);
+
+  /* Semantic */
+  --positive:   #2E7D4F;
+  --positive-bg: rgba(46, 125, 79, 0.08);
+  --caution:    #B8691A;
+  --caution-bg:  rgba(184, 105, 26, 0.08);
+  --danger:     #B83232;
+  --danger-bg:  rgba(184, 50, 50, 0.08);
+  --info:       #2E5FA3;
+  --info-bg:    rgba(46, 95, 163, 0.08);
+  --purple:     #6D4FC2;
+
+  /* Shadows — functional, not decorative */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.04);
+
+  /* Radii */
+  --r-sm: 8px;
+  --r:    12px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+
+  /* Type scale */
+  --font-body:    'Comfortaa', system-ui, sans-serif;
+  --font-head:    'Inter Tight', system-ui, sans-serif;
+  --font-display: 'Comfortaa', system-ui, sans-serif;
+  --font-mono:    'Fragment Mono', 'Fira Mono', monospace;
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --bg:       #181410;
+  --surface:  #241F1A;
+  --surface2: #302A22;
+  --surface3: #3C352C;
+
+  --text:    #F0EDE6;
+  --text2:   #C8C4BC;
+  --muted:   #8A8680;
+  --subtle:  #5A5855;
+
+  --line:    rgba(255, 255, 255, 0.08);
+  --line2:   rgba(255, 255, 255, 0.14);
+
+  --accent:     #2A8A72;
+  --accent-lt:  #33A688;
+  --accent-dk:  #1D6A5C;
+  --accent-bg:  rgba(42, 138, 114, 0.12);
+  --accent-ring: rgba(42, 138, 114, 0.30);
+
+  --positive:   #3DA064;
+  --positive-bg: rgba(61, 160, 100, 0.12);
+  --caution:    #D4842A;
+  --caution-bg:  rgba(212, 132, 42, 0.12);
+  --danger:     #D44848;
+  --danger-bg:  rgba(212, 72, 72, 0.12);
+  --info:       #4A7FD4;
+  --info-bg:    rgba(74, 127, 212, 0.12);
+  --purple:     #9070E0;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.24), 0 1px 2px rgba(0,0,0,0.16);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.32), 0 2px 4px rgba(0,0,0,0.16);
+  --shadow-lg:  0 8px 24px rgba(0,0,0,0.40), 0 2px 6px rgba(0,0,0,0.16);
+}
+
+/* ── Base reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+img, svg { display: block; }
+a { color: inherit; }
+button { font-family: inherit; }
+
+/* ── Logo mark ───────────────────────────────────────────────────── */
+.c-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.c-mark-glyph {
+  font-family: var(--font-head);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.04em;
+  color: var(--accent);
+  line-height: 1;
+  position: relative;
+  top: 0;
+}
+.c-mark-glyph .dot {
+  font-size: 11px;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 0.5px;
+}
+.c-mark-word {
+  font-family: 'Comfortaa', system-ui, sans-serif;
+  font-weight: 300;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────── */
+.c-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 0 48px;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+.c-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 100px;
+  box-shadow: var(--shadow-sm);
+  padding: 4px;
+}
+.c-nav-links a {
+  font-family: 'Comfortaa', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 5px 22px;
+  border-radius: 100px;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.c-nav-links a:hover { color: var(--text); background: var(--surface2); }
+.c-nav-links a.active { color: var(--accent); font-weight: 500; background: var(--accent-bg); }
+.c-nav-right { display: flex; align-items: center; gap: 12px; }
+
+.c-nav-pill {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 5px 14px;
+  cursor: default;
+}
+.soon-pill {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  padding: 2px 7px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line2);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { color: var(--text); background: var(--surface2); }
+.theme-toggle svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.icon-sun { display: block; }
+.icon-moon { display: none; }
+[data-theme="dark"] .icon-sun { display: none; }
+[data-theme="dark"] .icon-moon { display: block; }
+
+[data-theme="dark"] .c-nav-links { background: var(--surface2); border-color: var(--line2); }
+
+@media (max-width: 768px) {
+  .c-nav { padding: 0 20px; }
+  .c-nav-links { display: none; }
+}
+
+/* ── Footer ──────────────────────────────────────────────────────── */
+.c-footer {
+  border-top: 1px solid var(--line);
+  padding: 28px 48px 36px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.c-footer-left { display: flex; flex-direction: column; gap: 8px; }
+.c-footer-disc {
+  font-size: 12.5px;
+  color: var(--subtle);
+  max-width: 560px;
+  line-height: 1.7;
+}
+.c-footer-right {
+  font-size: 12px;
+  color: var(--subtle);
+  text-align: right;
+  line-height: 1.8;
+}
+@media (max-width: 768px) {
+  .c-footer { padding: 24px 20px 32px; }
+  .c-footer-right { text-align: left; }
+}
+
+/* ── Shared page utilities ───────────────────────────────────────── */
+.page { min-height: 100vh; display: flex; flex-direction: column; }
+.page-body { flex: 1; }
+
+/* Fade in */
+.fade-up {
+  animation: fadeUp 0.4s ease both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up-d1 { animation-delay: 0.06s; }
+.fade-up-d2 { animation-delay: 0.12s; }
+.fade-up-d3 { animation-delay: 0.18s; }
+.fade-up-d4 { animation-delay: 0.24s; }
+
+/* ── Theme toggle script helper ──────────────────────────────────── */
+/* Put this inline in <head> to avoid flash:
+   <script>
+     const t = localStorage.getItem('copena-theme');
+     if (t) document.documentElement.setAttribute('data-theme', t);
+   </script>
+*/

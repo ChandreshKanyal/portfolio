@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SWP Calculator · Copena</title>
+<meta name="description" content="Plan your systematic withdrawal — find your safe SWP, see how long your corpus lasts, and stress-test against inflation. Free by Copena."/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231D6A5C'/%3E%3Ctext x='6' y='23' font-family='Georgia,serif' font-size='20' font-weight='bold' fill='white'%3Ec%3C/text%3E%3Ccircle cx='22' cy='9' r='3' fill='white'/%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Fragment+Mono&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter+Tight:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="copena-design.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="copena-utils.js"></script>
+<script>const t=localStorage.getItem('copena-theme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+<style>
+.tool-layout{display:grid;grid-template-columns:360px 1fr;align-items:start;min-height:calc(100vh - 56px)}
+.sidebar{position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;border-right:1px solid var(--line);padding:28px 28px 40px;scrollbar-width:thin;scrollbar-color:var(--surface3) transparent}
+.main-content{padding:28px 36px 80px;min-width:0}
+@media(max-width:900px){.tool-layout{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}.main-content{padding:24px 20px 60px}}
+.sidebar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.sidebar-title{font-family:var(--font-display);font-size:15px;font-weight:400;font-optical-sizing:auto;color:var(--text)}
+.sidebar-reset{font-size:12px;color:var(--muted);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:var(--r-sm);transition:color .15s,background .15s;font-family:var(--font-body)}
+.sidebar-reset:hover{color:var(--text);background:var(--surface2)}
+.sec-hd{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--subtle);padding:16px 0 10px;border-top:1px solid var(--line)}
+.ctrl{margin-bottom:20px}
+.ctrl-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px}
+.ctrl-name{font-size:14px;color:var(--text2)}
+.ctrl-val{font-family:var(--font-mono);font-size:13px;color:var(--text)}
+.ctrl-val.v-purple,.ctrl-val.v-blue,.ctrl-val.v-red,.ctrl-val.v-caution{color:var(--text)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:2px;border-radius:2px;outline:none;cursor:pointer;background:linear-gradient(to right,var(--text2) 0%,var(--text2) var(--pct,50%),var(--surface3) var(--pct,50%),var(--surface3) 100%)}
+input[type=range].r-purple,input[type=range].r-blue,input[type=range].r-red,input[type=range].r-caution{background:linear-gradient(to right,var(--text2) 0%,var(--text2) var(--pct,50%),var(--surface3) var(--pct,50%),var(--surface3) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--surface);box-shadow:0 0 0 2px var(--text2),0 1px 4px rgba(0,0,0,.15);cursor:pointer;transition:transform .15s}
+input[type=range].r-purple::-webkit-slider-thumb,input[type=range].r-blue::-webkit-slider-thumb,input[type=range].r-red::-webkit-slider-thumb,input[type=range].r-caution::-webkit-slider-thumb{box-shadow:0 0 0 2px var(--text2),0 1px 4px rgba(0,0,0,.15)}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.22)}
+.range-ends{display:flex;justify-content:space-between;margin-top:5px;font-family:var(--font-mono);font-size:10.5px;color:var(--subtle)}
+.ctrl-hint{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:4px}
+.ctrl-note{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);margin-top:4px}
+.info-box{background:var(--info-bg);border:1px solid rgba(46,95,163,.20);border-radius:var(--r-sm);padding:13px 15px;font-size:12.5px;color:var(--text2);line-height:1.7;margin-top:12px}
+.info-box-label{display:block;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+
+/* Depletion banner */
+.depletion-bar{background:var(--danger-bg);border:1px solid rgba(184,50,50,.22);border-radius:var(--r);padding:14px 18px;display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.depletion-bar.hidden{display:none}
+.depletion-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.depletion-msg{font-size:13.5px;color:var(--text2);line-height:1.6}
+.depletion-msg strong{color:var(--danger)}
+
+/* Tool hero */
+.tool-hero{padding-bottom:24px;margin-bottom:24px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.tool-hero-left h1{font-family:var(--font-display);font-size:1.75rem;font-weight:400;font-optical-sizing:auto;letter-spacing:-.01em;color:var(--text);margin-bottom:4px}
+.tool-hero-left p{font-size:13.5px;color:var(--muted)}
+.tool-hero-right{text-align:right;flex-shrink:0}
+.corpus-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.10em;text-transform:uppercase;color:var(--subtle);margin-bottom:4px}
+.corpus-num{font-family:var(--font-head);font-weight:900;font-size:clamp(1.8rem,3vw,2.6rem);letter-spacing:-.04em;color:var(--text);line-height:1}
+.corpus-chips{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px;flex-wrap:wrap}
+.corpus-chip{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);background:var(--surface2);border:1px solid var(--line2);border-radius:100px;padding:3px 12px}
+.corpus-chip strong{color:var(--text2)}
+@media(max-width:640px){.tool-hero{flex-direction:column;align-items:flex-start}.tool-hero-right{text-align:left}.corpus-chips{justify-content:flex-start}}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+@media(max-width:640px){.metrics{grid-template-columns:1fr 1fr}}
+.metric{background:rgba(245,244,242,0.55);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);padding:20px 20px 16px;border-radius:var(--r-lg);border:none;box-shadow:var(--shadow-sm);position:relative;transition:box-shadow 0.25s,transform 0.3s cubic-bezier(0.34,1.4,0.64,1)}
+.metric::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:conic-gradient(from 210deg,rgba(180,188,200,0.3) 0%,rgba(140,150,165,0.08) 25%,rgba(120,128,140,0.03) 50%,rgba(140,150,165,0.08) 75%,rgba(180,188,200,0.3) 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:destination-out;mask-composite:exclude;pointer-events:none;transition:background 0.3s}
+.metric::after{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(160,160,160,0.18) 0%,transparent 62%);pointer-events:none;opacity:0;transition:opacity 0.25s}
+.metric:hover{box-shadow:var(--shadow-md),0 0 18px rgba(170,170,170,0.25);transform:translateY(-3px)}
+.metric:hover::before{background:conic-gradient(from 210deg,rgba(220,228,242,1) 0%,rgba(180,190,210,0.6) 18%,rgba(130,140,158,0.1) 45%,rgba(160,170,190,0.4) 72%,rgba(220,228,242,1) 100%)}
+.metric:hover::after{opacity:1}
+.m-label{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--subtle);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.m-label::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.m-sc .m-label::before,.m-sw .m-label::before,.m-tw .m-label::before,.m-re .m-label::before,.m-rm .m-label::before,.m-cl .m-label::before{background:var(--muted)}
+.m-val{font-family:var(--font-head);font-weight:800;font-size:1.7rem;letter-spacing:-.03em;line-height:1;margin-bottom:7px}
+.m-sc .m-val,.m-sw .m-val,.m-tw .m-val,.m-re .m-val,.m-rm .m-val,.m-cl .m-val{color:var(--text2)}
+.m-sub{font-size:12px;color:var(--subtle);line-height:1.45}
+
+/* Charts */
+.charts-row{display:grid;grid-template-columns:1fr 272px;gap:16px;margin-bottom:16px}
+@media(max-width:980px){.charts-row{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.card-title{font-family:var(--font-display);font-size:15px;font-weight:400;font-optical-sizing:auto;letter-spacing:0;color:var(--text)}
+.card-sub{font-size:12.5px;color:var(--subtle);margin-top:2px}
+.tabs{display:flex;gap:2px;background:var(--surface2);border-radius:100px;padding:3px;border:1px solid var(--line);flex-shrink:0}
+.tab{padding:5px 13px;border-radius:100px;font-size:12.5px;font-weight:500;cursor:pointer;color:var(--muted);transition:all .15s;border:none;background:transparent;font-family:var(--font-body);white-space:nowrap}
+.tab.on{background:var(--surface);color:var(--accent);box-shadow:var(--shadow-sm);border:1px solid var(--line)}
+.chart-box{position:relative;height:300px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.leg-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.leg-dot.dashed{opacity:.55}
+
+/* Donut */
+.donut-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column}
+.donut-box{position:relative;height:190px;margin:6px 0}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.donut-center-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.10em;text-transform:uppercase;color:var(--subtle)}
+.donut-center-val{font-family:var(--font-head);font-weight:800;font-size:1.3rem;letter-spacing:-.03em;color:var(--text2);line-height:1.2;margin-top:2px}
+.donut-legend{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.donut-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2)}
+.donut-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.donut-val{margin-left:auto;font-family:var(--font-head);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text)}
+
+/* Table */
+.tbl-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin-bottom:14px}
+.tbl-title{font-family:var(--font-display);font-size:15px;font-weight:400;font-optical-sizing:auto;letter-spacing:0;margin-bottom:16px;color:var(--text)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:560px}
+thead th{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--subtle);text-align:right;padding:9px 12px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:400;background:var(--surface2)}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:1px solid var(--line);transition:background .12s}
+tbody tr:hover{background:var(--surface2)}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 12px;text-align:right;font-family:var(--font-head);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+td:first-child{text-align:left;font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text2)}
+td.c-accent,td.c-positive,td.c-caution,td.c-danger,td.c-purple,td.c-info{color:var(--text)}
+tbody tr.final-row{background:var(--surface2)}
+tbody tr.final-row td:first-child{border-left:2px solid var(--text2);padding-left:10px}
+tbody tr.depleted-row{background:var(--danger-bg)}
+tbody tr.depleted-row td:first-child{border-left:2px solid var(--danger);padding-left:10px}
+
+/* Compare banner */
+.compare-banner{background:var(--accent-bg);border:1px solid var(--accent-ring);border-radius:var(--r);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:0}
+.compare-text{font-size:14px;color:var(--text2);line-height:1.8;max-width:580px}
+.compare-text strong{color:var(--text)}.compare-text .hi{color:var(--text2);font-weight:600}.compare-text .lo{color:var(--muted)}
+.compare-badge{font-family:var(--font-head);font-weight:800;font-size:1.3rem;letter-spacing:-.025em;color:var(--text2);white-space:nowrap;background:var(--surface);border:1.5px solid var(--line2);border-radius:100px;padding:7px 18px}
+input.ctrl-num{background:transparent;border:none;border-bottom:1px dashed transparent;outline:none;text-align:right;width:88px;padding:0;font-family:inherit;font-size:inherit;color:inherit;transition:border-color .15s;cursor:text}
+input.ctrl-num:hover,input.ctrl-num:focus,
+input.ctrl-num.v-purple:hover,input.ctrl-num.v-purple:focus,
+input.ctrl-num.v-blue:hover,input.ctrl-num.v-blue:focus,
+input.ctrl-num.v-red:hover,input.ctrl-num.v-red:focus,
+input.ctrl-num.v-caution:hover,input.ctrl-num.v-caution:focus{border-bottom-color:var(--text2)}
+
+/* Metric tile — frosted glass */
+[data-theme="dark"] .metric {
+  background: rgba(28, 18, 6, 0.45);
+  backdrop-filter: blur(20px) saturate(1.5) brightness(0.94);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5) brightness(0.94);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(220,172,68,0.10);
+}
+
+/* Nav active: grey in light, gold in dark */
+.c-nav-links a.active { color: var(--text2); background: var(--surface2); font-weight: 500; }
+[data-theme="dark"] .c-nav-links a.active { color: #C8A256; background: rgba(200,162,86,0.12); }
+
+/* Dark mode: Birkin × iPhone XS gold × chandelier */
+[data-theme="dark"] {
+  --bg:       #090602;
+  --surface:  #130E05;
+  --surface2: #1E1608;
+  --surface3: #2C200E;
+  --text:    #F4F0E6;
+  --text2:   #C4BDA8;
+  --muted:   #887E6A;
+  --subtle:  #584E3C;
+  --line:    rgba(220, 172, 68, 0.09);
+  --line2:   rgba(220, 172, 68, 0.18);
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.40), 0 1px 2px rgba(0,0,0,0.28);
+  --shadow-md:  0 4px 12px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.28);
+  --shadow-lg:  0 8px 28px rgba(0,0,0,0.65), 0 2px 6px rgba(0,0,0,0.28);
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav class="c-nav">
+    <a href="index.html" class="c-mark">
+      <span class="c-mark-glyph">c<span class="dot">°</span></span>
+      <span class="c-mark-word">copena</span>
+    </a>
+    <div class="c-nav-links">
+      <a href="SIP.html">SIP Calculator</a>
+      <a href="SWP.html" class="active">SWP Calculator</a>
+      <a href="#" style="color:var(--subtle)">Retirement <span class="soon-pill">soon</span></a>
+      <a href="#" style="color:var(--subtle)">Goal Planner <span class="soon-pill">soon</span></a>
+    </div>
+    <div class="c-nav-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <div class="tool-layout">
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <div class="sidebar-title">Parameters</div>
+        <button class="sidebar-reset" onclick="resetDefaults()">Reset</button>
+      </div>
+
+      <div class="sec-hd">Corpus &amp; Withdrawal</div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Starting corpus</span><input type="text" class="ctrl-val ctrl-num v-blue" id="v-corpus" onfocus="numFocus('corpus')" onblur="numBlur('corpus')" onkeydown="numKey(event,'corpus')"></div>
+        <input class="r-blue" type="range" id="corpus" min="500000" max="50000000" step="500000" value="10000000" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>₹5L</span><span>₹5 Cr</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Monthly withdrawal</span><input type="text" class="ctrl-val ctrl-num v-red" id="v-monthly" onfocus="numFocus('monthly')" onblur="numBlur('monthly')" onkeydown="numKey(event,'monthly')"></div>
+        <input class="r-red" type="range" id="monthly" min="5000" max="500000" step="5000" value="50000" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>₹5K</span><span>₹5L</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Annual step-up</span><input type="text" class="ctrl-val ctrl-num v-purple" id="v-stepup" onfocus="numFocus('stepup')" onblur="numBlur('stepup')" onkeydown="numKey(event,'stepup')"></div>
+        <input class="r-purple" type="range" id="stepup" min="0" max="20" step="1" value="5" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>0% flat</span><span>20%</span></div>
+        <div class="ctrl-note" id="swp-note"></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Plan period</span><input type="text" class="ctrl-val ctrl-num" id="v-yrs" onfocus="numFocus('yrs')" onblur="numBlur('yrs')" onkeydown="numKey(event,'yrs')"></div>
+        <input type="range" id="yrs" min="5" max="40" step="1" value="20" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>5 yrs</span><span>40 yrs</span></div>
+      </div>
+
+      <div class="sec-hd">Returns &amp; Inflation</div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Expected CAGR</span><input type="text" class="ctrl-val ctrl-num v-blue" id="v-cagr" onfocus="numFocus('cagr')" onblur="numBlur('cagr')" onkeydown="numKey(event,'cagr')"></div>
+        <input class="r-blue" type="range" id="cagr" min="4" max="20" step="0.5" value="10" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>4%</span><span>20%</span></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Expense ratio</span><input type="text" class="ctrl-val ctrl-num v-red" id="v-er" onfocus="numFocus('er')" onblur="numBlur('er')" onkeydown="numKey(event,'er')"></div>
+        <input class="r-red" type="range" id="er" min="0" max="2.5" step="0.05" value="0.5" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>0%</span><span>2.5%</span></div>
+        <div class="ctrl-hint" id="er-note">Net CAGR: 9.50%</div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-row"><span class="ctrl-name">Annual inflation</span><input type="text" class="ctrl-val ctrl-num v-caution" id="v-inf" onfocus="numFocus('inf')" onblur="numBlur('inf')" onkeydown="numKey(event,'inf')"></div>
+        <input class="r-caution" type="range" id="inf" min="2" max="12" step="0.5" value="6" oninput="slide(this);recalc()"/>
+        <div class="range-ends"><span>2%</span><span>12%</span></div>
+      </div>
+      <div class="info-box">
+        <span class="info-box-label">Safe SWP formula</span>
+        Maximum sustainable flat monthly withdrawal: <strong>PMT = PV × r / (1 − (1+r)^−n)</strong>, where r = monthly net return and n = total months. This exactly depletes the corpus at the end of the plan period.
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="tool-hero fade-up">
+        <div class="tool-hero-left">
+          <h1>SWP Calculator</h1>
+          <p>Corpus drawdown plan · <span id="h-yrs">20</span>-year horizon</p>
+        </div>
+        <div class="tool-hero-right">
+          <div class="corpus-label">Remaining after <span id="h-yrs2">20</span> yrs</div>
+          <div class="corpus-num" id="h-remain">—</div>
+          <div class="corpus-chips">
+            <div class="corpus-chip">Safe SWP&nbsp;<strong id="h-safe">—</strong></div>
+            <div class="corpus-chip">Lasts&nbsp;<strong id="h-lasts">—</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="depletion-bar hidden fade-up" id="depletion-bar">
+        <div class="depletion-icon">⚠</div>
+        <div class="depletion-msg" id="depletion-msg">Corpus depletes before the end of your plan period.</div>
+      </div>
+
+      <div class="metrics fade-up fade-up-d1">
+        <div class="metric m-sc"><div class="m-label">Starting Corpus</div><div class="m-val" id="s-corp">—</div><div class="m-sub">initial balance</div></div>
+        <div class="metric m-sw"><div class="m-label">Safe SWP</div><div class="m-val" id="s-safe">—</div><div class="m-sub" id="s-safe-sub">max flat withdrawal</div></div>
+        <div class="metric m-tw"><div class="m-label">Total Withdrawn</div><div class="m-val" id="s-tw">—</div><div class="m-sub" id="s-tw-sub">over plan period</div></div>
+        <div class="metric m-re"><div class="m-label">Returns Earned</div><div class="m-val" id="s-ret">—</div><div class="m-sub">corpus growth while withdrawing</div></div>
+        <div class="metric m-rm"><div class="m-label">Remaining Corpus</div><div class="m-val" id="s-rem">—</div><div class="m-sub" id="s-rem-sub">after plan period</div></div>
+        <div class="metric m-cl"><div class="m-label">Corpus Lasts</div><div class="m-val" id="s-lasts">—</div><div class="m-sub" id="s-lasts-sub">—</div></div>
+      </div>
+
+      <div class="charts-row fade-up fade-up-d2">
+        <div class="card">
+          <div class="card-head">
+            <div><div class="card-title">Withdrawal plan</div><div class="card-sub" id="chart-sub">Corpus balance over time</div></div>
+            <div class="tabs">
+              <button class="tab on" data-v="corpus" onclick="setTab(this)">Corpus</button>
+              <button class="tab" data-v="cashflow" onclick="setTab(this)">Cashflow</button>
+              <button class="tab" data-v="noreturns" onclick="setTab(this)">vs No Returns</button>
+            </div>
+          </div>
+          <div class="chart-box"><canvas id="MC"></canvas></div>
+          <div class="legend" id="MC-legend"></div>
+        </div>
+        <div class="donut-card">
+          <div class="card-head"><div><div class="card-title">Flow breakdown</div><div class="card-sub">total over <span id="dn-yr">20</span> yrs</div></div></div>
+          <div class="donut-box">
+            <canvas id="DN"></canvas>
+            <div class="donut-center"><div class="donut-center-label">Total value</div><div class="donut-center-val" id="dn-center">—</div></div>
+          </div>
+          <div class="donut-legend">
+            <div class="donut-row"><div class="donut-dot" style="background:#0D2545"></div>Withdrawn<span class="donut-val" id="dn-tw">—</span></div>
+            <div class="donut-row" style="opacity:.7"><div class="donut-dot" style="background:var(--subtle)"></div>Returns earned<span class="donut-val" id="dn-re" style="color:var(--muted)">—</span></div>
+            <div class="donut-row"><div class="donut-dot" style="background:#5CC4E2"></div>Remaining<span class="donut-val" id="dn-rm">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tbl-card fade-up fade-up-d3">
+        <div class="tbl-title">Year-by-year milestones</div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Year</th><th>Monthly SWP</th><th>Withdrawn (yr)</th><th>Total Withdrawn</th><th>Returns (yr)</th><th>Corpus</th><th>Real Value</th></tr></thead>
+            <tbody id="TB"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="compare-banner fade-up fade-up-d3">
+        <div class="compare-text" id="CMP">—</div>
+        <div class="compare-badge" id="CMP-badge">—</div>
+      </div>
+    </main>
+  </div>
+
+  <footer class="c-footer">
+    <div class="c-footer-left">
+      <a href="index.html" class="c-mark"><span class="c-mark-glyph">c<span class="dot">°</span></span><span class="c-mark-word">copena</span></a>
+      <div class="c-footer-disc">Month-by-month simulation: each withdrawal = initial × (1+step-up)^floor(year). Returns compound on remaining corpus. Safe SWP uses the annuity formula PMT = PV×r/(1−(1+r)^−n). Real value = corpus ÷ (1+inflation)^year. For educational use only.</div>
+    </div>
+    <div class="c-footer-right">Not SEBI registered<br>Not financial advice</div>
+  </footer>
+</div>
+
+<script>
+document.getElementById('theme-toggle').addEventListener('click',()=>{const next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('copena-theme',next);if(MC)recalc()});
+function fmtSWP(v){return v>=L?'₹'+(v/L).toFixed(1)+'L/mo':'₹'+Math.round(v/1e3)+'K/mo'}
+document.querySelectorAll('input[type=range]').forEach(slide);
+function simSWP(initCorpus,monthly,cagr,yrs,stepup,inf){const r=cagr/12/100;let corp=initCorpus,totalWith=0,totalRet=0;const snaps=[{y:0,swp:monthly,corp,totalWith:0,totalRet:0,yearWith:0,yearRet:0,rv:initCorpus,depleted:false}];for(let yr=0;yr<yrs;yr++){const w=monthly*Math.pow(1+stepup/100,yr);let yWith=0,yRet=0;for(let m=0;m<12;m++){const ret=corp*r;yRet+=ret;corp+=ret;const wm=Math.min(w,Math.max(0,corp));corp-=wm;yWith+=wm;totalWith+=wm;totalRet+=ret}snaps.push({y:yr+1,swp:w,corp:Math.max(0,corp),totalWith,totalRet,yearWith:yWith,yearRet:yRet,rv:Math.max(0,corp)/Math.pow(1+inf/100,yr+1),depleted:corp<=0})}return snaps}
+function safeSWP(corpus,cagr,yrs,stepup){
+  const r=cagr/12/100,g=(stepup||0)/100;
+  if(g===0){const n=yrs*12;if(r===0)return corpus/n;return corpus*r/(1-Math.pow(1+r,-n))}
+  // Growing annuity: payments rise g% per year; A = PV factor for 12 level monthly payments
+  const A=r===0?12:(1-Math.pow(1+r,-12))/r;
+  const q=(1+g)/Math.pow(1+r,12);
+  const S=Math.abs(q-1)<1e-10?yrs:(1-Math.pow(q,yrs))/(1-q);
+  return corpus/(A*S);
+}
+function corpusLasts(corpus,monthly,cagr,stepup,max){const r=cagr/12/100;let c=corpus;for(let m=0;m<max;m++){const w=monthly*Math.pow(1+stepup/100,Math.floor(m/12));c=c*(1+r)-w;if(c<=0)return m+1}return null}
+function baseOpts(){const t=th();return{responsive:true,maintainAspectRatio:false,animation:{duration:320},interaction:{mode:'index',intersect:false},layout:{padding:{top:8,right:12}},plugins:{legend:{display:false},tooltip:{backgroundColor:t.bg,borderColor:t.bd,borderWidth:1,titleColor:t.tc,bodyColor:t.bc,padding:12,cornerRadius:10,titleFont:{family:'Comfortaa',weight:'600'},bodyFont:{family:'Fragment Mono',size:11},callbacks:{label:c=>'  '+c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{y:{ticks:{callback:v=>fmt(v),maxTicksLimit:6,color:t.tick,font:{family:'Fragment Mono',size:10},padding:7},grid:{color:t.grid,drawTicks:false},border:{display:false}},x:{ticks:{maxTicksLimit:12,autoSkip:true,color:t.tick,font:{family:'Fragment Mono',size:10}},grid:{display:false},border:{color:t.axis}}}}}
+let MC=null,DN=null,curTab='corpus';
+function setTab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');curTab=el.dataset.v;recalc()}
+function renderChart(type,data,opts){if(!MC)MC=new Chart(document.getElementById('MC').getContext('2d'),{type,data,options:opts});else{MC.config.type=type;MC.data=data;MC.options=opts;MC.update('none')}}
+function drawCorpus(snaps,ms){document.getElementById('chart-sub').textContent='Corpus balance over time with withdrawals';const T='#1E6DB0',R='#0D2545',ctx=document.getElementById('MC').getContext('2d');const fg=col=>({target:'origin',above:c=>areaGrad(ctx,c.chart.chartArea,col,0.28)});const ds=[{label:'Corpus',data:ms.map(y=>snaps[y].corp),borderColor:T,borderWidth:2.5,pointRadius:0,pointHoverRadius:4,fill:fg(T),tension:0.4},{label:'Total withdrawn',data:ms.map(y=>snaps[y].totalWith),borderColor:R,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false,tension:0.4}];setLegend('MC-legend',[{c:T,l:'Corpus'},{c:R,l:'Total withdrawn',dash:true}]);renderChart('line',{labels:ms.map(y=>'Yr '+y),datasets:ds},baseOpts())}
+function drawCashflow(snaps,ms){document.getElementById('chart-sub').textContent='Yearly withdrawal vs returns earned';const R='#0D2545',B='#5CC4E2';const ds=[{label:'Withdrawn (yr)',data:ms.map(y=>snaps[y].yearWith),backgroundColor:R+'44',borderColor:R,borderWidth:1.5,borderRadius:4,stack:'a'},{label:'Returns (yr)',data:ms.map(y=>snaps[y].yearRet),backgroundColor:B+'44',borderColor:B,borderWidth:1.5,borderRadius:4,stack:'b'}];setLegend('MC-legend',[{c:R,l:'Withdrawn (yr)'},{c:B,l:'Returns earned (yr)'}]);renderChart('bar',{labels:ms.map(y=>'Yr '+y),datasets:ds},baseOpts())}
+function drawNoReturns(snaps,ms,corpus,monthly,stepup){document.getElementById('chart-sub').textContent='With returns vs holding cash (same withdrawals, no growth)';const T='#1E6DB0',G=isDark()?'#5A5855':'#C8C5BF',ctx=document.getElementById('MC').getContext('2d');const fg=col=>({target:'origin',above:c=>areaGrad(ctx,c.chart.chartArea,col,0.28)});const noRet=ms.map(y=>{let cum=0;for(let yr=0;yr<y;yr++)cum+=monthly*Math.pow(1+stepup/100,yr)*12;return Math.max(0,corpus-cum)});const ds=[{label:'With returns',data:ms.map(y=>snaps[y].corp),borderColor:T,borderWidth:2.5,pointRadius:0,fill:fg(T),tension:0.4},{label:'No returns (cash)',data:noRet,borderColor:G,borderWidth:1.5,borderDash:[5,4],pointRadius:0,fill:false,tension:0}];setLegend('MC-legend',[{c:T,l:'With returns'},{c:G,l:'No returns (cash)',dash:true}]);renderChart('line',{labels:ms.map(y=>'Yr '+y),datasets:ds},baseOpts())}
+const DEFAULTS={corpus:10000000,monthly:50000,stepup:5,yrs:20,cagr:10,er:0.5,inf:6};
+function resetDefaults(){Object.entries(DEFAULTS).forEach(([id,val])=>{const el=document.getElementById(id);if(el){el.value=val;slide(el)}});recalc()}
+function recalc(){
+  const corpus=rv('corpus'),monthly=rv('monthly'),stepup=rv('stepup'),cagr=rv('cagr'),er=rv('er'),yrs=rv('yrs'),inf=rv('inf');
+  const netCagr=Math.max(0,cagr-er);
+  setVal('v-corpus',fmt(corpus));
+  setVal('v-monthly',monthly>=L?'₹'+(monthly/L).toFixed(1)+'L':'₹'+(monthly/1e3).toFixed(0)+'K');
+  setVal('v-stepup',stepup+'%');
+  setVal('v-yrs',yrs+' year'+(yrs>1?'s':''));
+  setVal('v-cagr',cagr.toFixed(1)+'%');
+  setVal('v-er',er.toFixed(2)+'%');
+  document.getElementById('er-note').textContent='Net CAGR: '+netCagr.toFixed(2)+'%';
+  setVal('v-inf',inf.toFixed(1)+'%');
+  document.getElementById('dn-yr').textContent=yrs;document.getElementById('h-yrs').textContent=yrs;document.getElementById('h-yrs2').textContent=yrs;
+  const fSwp=monthly*Math.pow(1+stepup/100,yrs-1);
+  document.getElementById('swp-note').textContent=stepup>0?`SWP in year ${yrs}: ${fmtSWP(fSwp)}`:'';
+  const snaps=simSWP(corpus,monthly,netCagr,yrs,stepup,inf);
+  const F=snaps[snaps.length-1];
+  const safe=safeSWP(corpus,netCagr,yrs,stepup);
+  const lastsMonths=corpusLasts(corpus,monthly,netCagr,stepup,1200);
+  const depletionSnap=snaps.find(s=>s.y>0&&s.depleted);
+  const isForever=lastsMonths===null&&!depletionSnap;
+  const lastsStr=isForever?'Forever':lastsMonths?Math.floor(lastsMonths/12)+' yrs '+(lastsMonths%12)+'mo':(depletionSnap?'Yr '+depletionSnap.y:'—');
+  animateVal(document.getElementById('h-remain'),fmt(F.corp),400);
+  document.getElementById('h-safe').textContent=fmtSWP(safe);
+  document.getElementById('h-lasts').textContent=lastsStr;
+  const bar=document.getElementById('depletion-bar');
+  if(depletionSnap){bar.classList.remove('hidden');document.getElementById('depletion-msg').innerHTML=`Corpus depletes in <strong>Year ${depletionSnap.y}</strong> at ${fmtSWP(monthly)} withdrawal. Safe SWP for ${yrs} years at this CAGR is <strong>${fmtSWP(safe)}</strong>.`}else bar.classList.add('hidden');
+  animateVal(document.getElementById('s-corp'),fmt(corpus),360);
+  document.getElementById('s-safe').textContent=fmtSWP(safe);document.getElementById('s-safe-sub').textContent=(stepup>0?'starting SWP · '+stepup+'% step-up · ':'')+'exact depletion in '+yrs+' yrs';
+  animateVal(document.getElementById('s-tw'),fmt(F.totalWith),360);document.getElementById('s-tw-sub').textContent=yrs+' yrs of withdrawals';
+  animateVal(document.getElementById('s-ret'),fmt(F.totalRet),360);
+  animateVal(document.getElementById('s-rem'),fmt(F.corp),360);document.getElementById('s-rem-sub').textContent=F.corp>0?'real: '+fmt(F.rv):'corpus depleted';
+  document.getElementById('s-lasts').textContent=isForever?'Forever':lastsStr;document.getElementById('s-lasts-sub').textContent=isForever?'perpetual at current settings':monthly>safe?'above safe withdrawal rate':'within safe range';
+  document.getElementById('dn-center').textContent=fmt(F.totalWith+Math.max(0,F.corp));
+  document.getElementById('dn-tw').textContent=fmt(F.totalWith);document.getElementById('dn-re').textContent=fmt(F.totalRet);document.getElementById('dn-rm').textContent=fmt(Math.max(0,F.corp));
+  const step=yrs<=10?1:yrs<=20?2:5,ms=[];for(let y=step;y<=yrs;y+=step)ms.push(y);if(ms[ms.length-1]!==yrs)ms.push(yrs);
+  if(curTab==='corpus')drawCorpus(snaps,ms);else if(curTab==='cashflow')drawCashflow(snaps,ms);else drawNoReturns(snaps,ms,corpus,monthly,stepup);
+  const dData=[Math.max(0,F.totalWith),Math.max(0,F.corp)];
+  const dCols=['#0D2545','#5CC4E2'];
+  if(!DN){DN=new Chart(document.getElementById('DN').getContext('2d'),{type:'doughnut',data:{labels:['Withdrawn','Remaining'],datasets:[{data:dData,backgroundColor:dCols,borderColor:isDark()?'#130E05':'#FFFFFF',borderWidth:2,borderRadius:6,hoverOffset:8,spacing:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',animation:{duration:420},plugins:{legend:{display:false},tooltip:{backgroundColor:th().bg,borderColor:th().bd,borderWidth:1,titleColor:th().tc,bodyColor:th().bc,padding:10,cornerRadius:9,callbacks:{label:c=>'  '+c.label+': '+fmt(c.parsed)}}}}})}else{DN.data.datasets[0].data=dData;DN.data.datasets[0].borderColor=isDark()?'#130E05':'#FFFFFF';DN.update()}
+  const tb=document.getElementById('TB');tb.innerHTML='';
+  ms.forEach((y,i)=>{const s=snaps[y],isFinal=i===ms.length-1,isDep=s.depleted;const cls=[isFinal&&!isDep?'final-row':'',isDep?'depleted-row':''].filter(Boolean).join(' ');tb.insertAdjacentHTML('beforeend',`<tr${cls?' class="'+cls+'"':''}><td>Year ${y}${isFinal&&!isDep?' <span style="font-size:10px;color:var(--subtle);font-family:var(--font-mono)">end</span>':''}${isDep?' <span style="font-size:10px;color:var(--danger);font-family:var(--font-mono)">depleted</span>':''}</td><td class="c-purple">${fmtSWP(s.swp)}</td><td class="c-danger">${fmt(s.yearWith)}</td><td>${fmt(s.totalWith)}</td><td class="c-info">${fmt(s.yearRet)}</td><td class="c-accent">${fmt(s.corp)}</td><td class="c-caution">${fmt(s.rv)}</td></tr>`)});
+  let _noRetC=corpus,noRetYrs=null;for(let yr=0;yr<200;yr++){_noRetC-=monthly*Math.pow(1+stepup/100,yr)*12;if(_noRetC<=0){noRetYrs=yr+1;break}}
+  const noRetStr=noRetYrs?noRetYrs+' years':'100+ years';
+  document.getElementById('CMP').innerHTML=`Over ${yrs} years, your <strong>${fmt(corpus)}</strong> corpus pays out <span class="hi">${fmt(F.totalWith)}</span> in withdrawals${F.corp>0?' and leaves <span class="hi">'+fmt(F.corp)+'</span> remaining':' and is fully drawn down'}. Returns earned while withdrawing: <strong>${fmt(F.totalRet)}</strong>. The same corpus with no returns would deplete in <strong>${noRetStr}</strong>.`;
+  document.getElementById('CMP-badge').textContent=isForever?'∞ forever':lastsStr;
+}
+document.querySelectorAll('input[type=range]').forEach(slide);
+recalc();
+document.querySelectorAll('.metric').forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');card.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%')})});
+</script>
+</body>
+</html>
